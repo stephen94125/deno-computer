@@ -197,6 +197,130 @@ For uncertain data shape, first inspect or normalize the data in a small bounded
 
 ---
 
+# Usage Notes
+
+## AlaSQL
+
+For table-shaped aggregation, prefer `alasql` when the query is naturally SQL-like.
+
+Good use cases:
+
+- `GROUP BY`
+- `SUM`
+- `COUNT`
+- `COUNT(DISTINCT ...)`
+- `ORDER BY`
+- `JOIN`
+- `SELECT DISTINCT`
+- top-N summaries
+
+For very small transformations, clear TypeScript loops are acceptable.
+
+The hard rule is not "must use libraries." The hard rule is: computed numbers must come from code executed through `scripts/run-deno-computer.sh`, not from imagination.
+
+## simple-statistics
+
+Use `ss` for statistical calculations:
+
+```ts
+ss.mean(values)
+ss.median(values)
+ss.standardDeviation(values)
+ss.quantile(values, 0.9)
+ss.sampleCorrelation(xs, ys)
+```
+
+## mathjs
+
+Use `math` for general math helpers and rounding:
+
+```ts
+math.sum(values)
+math.round(value, 2)
+```
+
+Do not add matrix-specific libraries by default. If serious linear algebra is needed, reconsider the tool choice.
+
+## date-fns
+
+Use `dfns` for date formatting and date arithmetic:
+
+```ts
+dfns.format(new Date(), "yyyy-MM-dd HH:mm:ss")
+dfns.addDays(new Date(), 7)
+dfns.subDays(new Date(), 1)
+```
+
+## CSV
+
+Use `csv.stringify` or `csv.parse` only as text conversion.
+
+Do not save CSV files.
+
+## Markdown Tables
+
+Use `markdownTable` for homogeneous flat summaries that the user or another LLM should read quickly.
+
+Do not manually hand-build Markdown table alignment unless necessary.
+
+---
+
+# Numeric Accuracy Rule
+
+If the answer contains a computed number, make sure the number came from executed code unless it is trivial mental arithmetic.
+
+Bad:
+
+```txt
+"The average is probably around 700."
+```
+
+Good:
+
+```txt
+Run Deno Computer → use stdout → answer with computed result.
+```
+
+For business reports, prefer computed output over verbal estimation.
+
+---
+
+# Failure Handling
+
+If type checking fails:
+
+1. Read the TypeScript error.
+2. Fix imports, types, or function names.
+3. Re-run through `scripts/run-deno-computer.sh`.
+
+If runtime fails:
+
+1. Inspect the error.
+2. Reduce the snippet.
+3. Validate data shape with `zod`.
+4. Re-run.
+
+Do not bypass the execution gateway to debug faster.
+
+---
+
+# Example Files
+
+See local examples if available:
+
+```txt
+examples/001-basic-math-stats.sh
+examples/002-zod-csv.sh
+examples/003-alasql-business-summary.sh
+examples/004-complex-business-analysis.sh
+examples/005-csv-output.sh
+examples/006-markdown-table-output.sh
+```
+
+These examples demonstrate the expected invocation style. Follow the same pattern.
+
+---
+
 # Common Examples
 
 ## Example 1: Basic math and statistics
@@ -364,127 +488,3 @@ const table = markdownTable([
 console.log(table);
 TS
 ```
-
----
-
-# Usage Notes
-
-## AlaSQL
-
-For table-shaped aggregation, prefer `alasql` when the query is naturally SQL-like.
-
-Good use cases:
-
-- `GROUP BY`
-- `SUM`
-- `COUNT`
-- `COUNT(DISTINCT ...)`
-- `ORDER BY`
-- `JOIN`
-- `SELECT DISTINCT`
-- top-N summaries
-
-For very small transformations, clear TypeScript loops are acceptable.
-
-The hard rule is not "must use libraries." The hard rule is: computed numbers must come from code executed through `scripts/run-deno-computer.sh`, not from imagination.
-
-## simple-statistics
-
-Use `ss` for statistical calculations:
-
-```ts
-ss.mean(values)
-ss.median(values)
-ss.standardDeviation(values)
-ss.quantile(values, 0.9)
-ss.sampleCorrelation(xs, ys)
-```
-
-## mathjs
-
-Use `math` for general math helpers and rounding:
-
-```ts
-math.sum(values)
-math.round(value, 2)
-```
-
-Do not add matrix-specific libraries by default. If serious linear algebra is needed, reconsider the tool choice.
-
-## date-fns
-
-Use `dfns` for date formatting and date arithmetic:
-
-```ts
-dfns.format(new Date(), "yyyy-MM-dd HH:mm:ss")
-dfns.addDays(new Date(), 7)
-dfns.subDays(new Date(), 1)
-```
-
-## CSV
-
-Use `csv.stringify` or `csv.parse` only as text conversion.
-
-Do not save CSV files.
-
-## Markdown Tables
-
-Use `markdownTable` for homogeneous flat summaries that the user or another LLM should read quickly.
-
-Do not manually hand-build Markdown table alignment unless necessary.
-
----
-
-# Numeric Accuracy Rule
-
-If the answer contains a computed number, make sure the number came from executed code unless it is trivial mental arithmetic.
-
-Bad:
-
-```txt
-"The average is probably around 700."
-```
-
-Good:
-
-```txt
-Run Deno Computer → use stdout → answer with computed result.
-```
-
-For business reports, prefer computed output over verbal estimation.
-
----
-
-# Failure Handling
-
-If type checking fails:
-
-1. Read the TypeScript error.
-2. Fix imports, types, or function names.
-3. Re-run through `scripts/run-deno-computer.sh`.
-
-If runtime fails:
-
-1. Inspect the error.
-2. Reduce the snippet.
-3. Validate data shape with `zod`.
-4. Re-run.
-
-Do not bypass the execution gateway to debug faster.
-
----
-
-# Example Files
-
-See local examples if available:
-
-```txt
-examples/001-basic-math-stats.sh
-examples/002-zod-csv.sh
-examples/003-alasql-business-summary.sh
-examples/004-complex-business-analysis.sh
-examples/005-csv-output.sh
-examples/006-markdown-table-output.sh
-```
-
-These examples demonstrate the expected invocation style. Follow the same pattern.
