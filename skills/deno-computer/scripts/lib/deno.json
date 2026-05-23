@@ -1,6 +1,10 @@
 {
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "dev": "deno run --watch --no-prompt main.ts",
+    "run": "deno run --no-prompt main.ts",
+    "check": "deno check main.ts",
+    "fmt": "deno fmt",
+    "lint": "deno lint"
   },
   "imports": {
     "@std/assert": "jsr:@std/assert@1",
