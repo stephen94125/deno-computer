@@ -68,11 +68,25 @@ import {
 
 ## Output Format Choice
 
+Default output preference:
+
+```txt
+Markdown table > CSV > JSON
+```
+
 Use:
 
-- **JSON** for heterogeneous or nested data.
-- **CSV** for flat homogeneous table data that may be copied into spreadsheets.
-- **Markdown table** for flat homogeneous summaries intended for LLM or human reading.
+- **Markdown table** by default when the result is homogeneous, flat, and table-shaped.
+- **CSV** when the result is homogeneous and likely to be copied into a spreadsheet or passed to another tool.
+- **JSON** when the result is heterogeneous, nested, or needs to preserve machine-readable structure.
+
+If the user does not specify an output format:
+
+```txt
+homogeneous table-like result → Markdown table
+heterogeneous / nested result → JSON
+spreadsheet-oriented flat data → CSV
+```
 
 ---
 
@@ -80,11 +94,13 @@ Use:
 
 ## Required Execution Gateway
 
-All TypeScript code for this skill **MUST** be executed through:
+All computation for this skill **MUST** be executed through:
 
 ```txt
 scripts/run-deno-computer.sh
 ```
+
+Do not compute, transform, aggregate, summarize, or derive numeric results with any other tool.
 
 Do not run TypeScript directly with `deno run`.
 
@@ -139,7 +155,8 @@ Do not:
 
 - Do not mentally calculate non-trivial numbers.
 - Do not invent numeric results.
-- Do not use this skill without executing the TypeScript.
+- Do not compute, transform, aggregate, summarize, or derive numeric results with tools other than `scripts/run-deno-computer.sh`.
+- Do not use this skill without executing the TypeScript through `scripts/run-deno-computer.sh`.
 - Do not use direct `deno run`, `deno check`, or `deno task run` for skill execution.
 - Do not bypass `scripts/run-deno-computer.sh`.
 - Do not edit `scripts/main.ts` directly.
@@ -167,12 +184,13 @@ For numeric or business-analysis tasks:
 2. Write a small TypeScript snippet.
 3. Import allowed tools from ./context.ts.
 4. Validate input data with zod when data shape matters.
-5. Use AlaSQL for grouping, aggregation, joins, ordering, and deduplication.
-6. Use simple-statistics for statistical calculations.
-7. Use mathjs for general math and rounding.
-8. Use date-fns for date formatting/arithmetic.
-9. Print the final result using console.log.
-10. Use the actual stdout result in the final answer.
+5. Use AlaSQL for naturally SQL-like grouping, aggregation, joins, ordering, and deduplication.
+6. Use clear TypeScript loops when the transformation is very small and easier to read than SQL.
+7. Use simple-statistics for statistical calculations.
+8. Use mathjs for general math and rounding.
+9. Use date-fns for date formatting/arithmetic.
+10. Print the final result using console.log.
+11. Use the actual stdout result in the final answer.
 ```
 
 For uncertain data shape, first inspect or normalize the data in a small bounded snippet. Do not assume deeply nested fields.
@@ -353,7 +371,7 @@ TS
 
 ## AlaSQL
 
-Prefer `alasql` for table-shaped business analysis.
+For table-shaped aggregation, prefer `alasql` when the query is naturally SQL-like.
 
 Good use cases:
 
@@ -366,7 +384,9 @@ Good use cases:
 - `SELECT DISTINCT`
 - top-N summaries
 
-Use SQL because LLMs are usually more reliable with SQL aggregation than with custom ad-hoc loops.
+For very small transformations, clear TypeScript loops are acceptable.
+
+The hard rule is not "must use libraries." The hard rule is: computed numbers must come from code executed through `scripts/run-deno-computer.sh`, not from imagination.
 
 ## simple-statistics
 
