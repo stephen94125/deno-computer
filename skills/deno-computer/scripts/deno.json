@@ -10,6 +10,7 @@
     "@std/csv": "jsr:@std/csv@^1.0.6",
     "alasql": "npm:alasql@^4.17.3",
     "date-fns": "npm:date-fns@^4.3.0",
+    "markdown-table": "npm:markdown-table@^3.0.4",
     "mathjs": "npm:mathjs@^15.2.0",
     "simple-statistics": "npm:simple-statistics@^7.8.9",
     "zod": "npm:zod@^4.4.3"

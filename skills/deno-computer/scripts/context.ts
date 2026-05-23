@@ -1,3 +1,4 @@
+export { markdownTable } from "markdown-table";
 export { z } from "zod";
 export * as ss from "simple-statistics";
 export * as math from "mathjs";
