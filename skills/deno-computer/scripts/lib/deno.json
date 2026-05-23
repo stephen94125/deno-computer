@@ -1,6 +1,5 @@
 {
   "tasks": {
-    "dev": "deno run --watch --no-prompt main.ts",
     "run": "deno run --no-prompt main.ts",
     "check": "deno check main.ts",
     "fmt": "deno fmt",
